@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatListModule} from '@angular/material/list';
 import { MapComponent } from './map.component';
 
 describe('MapComponent', () => {
