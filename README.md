@@ -1,5 +1,5 @@
 
-# Sk8park_F1ND3r
+# Sk8park_F1ND3R
 F1NDR
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17
