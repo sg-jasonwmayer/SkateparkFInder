@@ -1,7 +1,6 @@
 
 # Sk8park_F1ND3R
 F1NDR
-
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17
 
 ## Development server
@@ -30,4 +29,3 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 ## sk8ParkFinder
 ## Google API Experiment with gemini AI and a love for skateboarding &
 skateparks!
-
