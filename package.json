@@ -1,6 +1,6 @@
 {
   "name": "sk8-park-finder",
-  "version": "0.0.01",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
