@@ -1,0 +1,39 @@
+.map-page {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 16px;
+  padding: 16px;
+}
+
+.map {
+  width: 100%;
+  min-height: 70vh;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+.results {
+  max-height: 70vh;
+  overflow: auto;
+  padding: 8px 0;
+}
+
+.muted {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.error {
+  color: #b00020;
+}
+
+@media (max-width: 960px) {
+  .map-page {
+    grid-template-columns: 1fr;
+  }
+  .results {
+    max-height: none;
+  }
+}
+

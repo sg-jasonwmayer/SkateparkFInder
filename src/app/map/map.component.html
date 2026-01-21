@@ -1,17 +1,16 @@
-<div class="content " style="padding:200px;">
-
-
-
-<mat-list>
-    <mat-list-item>
-        <mat-slide-toggle ><p>Team Pain Parks</p></mat-slide-toggle>
-    </mat-list-item>
-    <mat-divider></mat-divider>
-    <mat-list-item>
-        <mat-slide-toggle ><p>Concrete Parks</p></mat-slide-toggle>
-    </mat-list-item>
-    <mat-divider></mat-divider>
-    <mat-list-item><mat-slide-toggle ><p>DIY Parks</p></mat-slide-toggle></mat-list-item>
-  </mat-list>
+<div class="map-page">
+  <div id="map" class="map"></div>
+  <div class="results">
+    <h2>Nearby Skateparks</h2>
+    <div *ngIf="loading" class="muted">Finding your location and nearby parks...</div>
+    <div *ngIf="error" class="error">{{ error }}</div>
+    <mat-list *ngIf="!loading && results.length">
+      <mat-list-item *ngFor="let park of results" (click)="focusPark(park)">
+        <div mat-line>{{ park.name || 'Unnamed skatepark' }}</div>
+        <div mat-line class="muted">{{ park.lat.toFixed(5) }}, {{ park.lon.toFixed(5) }}</div>
+      </mat-list-item>
+    </mat-list>
+    <div *ngIf="!loading && !results.length && !error" class="muted">No skateparks found nearby.</div>
+  </div>
 </div>
 
