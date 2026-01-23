@@ -196,7 +196,7 @@ export class MapComponent implements OnInit {
     }
     // Enrich with distance and indoor/outdoor classification
     const enriched: SkateparkView[] = this.results.map(r => {
-      const isIndoor = (r.tags?.indoor ?? '').toLowerCase() === 'yes';
+      const isIndoor = (r.tags?.['indoor'] ?? '').toLowerCase() === 'yes';
       const distanceMiles = this.haversineMiles(this.userLat!, this.userLon!, r.lat, r.lon);
       return { ...r, isIndoor, distanceMiles };
     });
