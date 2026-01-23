@@ -19,6 +19,13 @@
   padding: 8px 0;
 }
 
+.filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 8px 0 4px;
+}
+
 .muted {
   color: #666;
   font-size: 0.95rem;

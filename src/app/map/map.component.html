@@ -1,16 +1,29 @@
 <div class="map-page">
   <div id="map" class="map"></div>
   <div class="results">
-    <h2>Nearby Skateparks</h2>
+    <h2>Skateparks within 100 miles</h2>
+    <div class="filters">
+      <mat-slide-toggle [checked]="showIndoor" (change)="onToggleIndoor($event.checked)">
+        Indoor
+      </mat-slide-toggle>
+      <mat-slide-toggle [checked]="showOutdoor" (change)="onToggleOutdoor($event.checked)">
+        Outdoor
+      </mat-slide-toggle>
+    </div>
     <div *ngIf="loading" class="muted">Finding your location and nearby parks...</div>
     <div *ngIf="error" class="error">{{ error }}</div>
-    <mat-list *ngIf="!loading && results.length">
-      <mat-list-item *ngFor="let park of results" (click)="focusPark(park)">
+    <div *ngIf="!loading && !error" class="muted" style="margin: 8px 0;">
+      Showing {{ displayedResults.length }} result{{ displayedResults.length === 1 ? '' : 's' }}
+    </div>
+    <mat-list *ngIf="!loading && displayedResults.length">
+      <mat-list-item *ngFor="let park of displayedResults" (click)="focusPark(park)">
         <div mat-line>{{ park.name || 'Unnamed skatepark' }}</div>
-        <div mat-line class="muted">{{ park.lat.toFixed(5) }}, {{ park.lon.toFixed(5) }}</div>
+        <div mat-line class="muted">
+          {{ park.distanceMiles | number:'1.0-1' }} mi • {{ park.isIndoor ? 'Indoor' : 'Outdoor' }}
+        </div>
       </mat-list-item>
     </mat-list>
-    <div *ngIf="!loading && !results.length && !error" class="muted">No skateparks found nearby.</div>
+    <div *ngIf="!loading && !displayedResults.length && !error" class="muted">No skateparks found with current filters.</div>
   </div>
 </div>
 

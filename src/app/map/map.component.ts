@@ -14,6 +14,10 @@ type SkateparkResult = {
   lon: number;
   tags?: Record<string, string>;
 };
+type SkateparkView = SkateparkResult & {
+  distanceMiles: number;
+  isIndoor: boolean;
+};
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -31,10 +35,15 @@ export class MapComponent implements OnInit {
   loading = false;
   error: string | null = null;
   results: SkateparkResult[] = [];
+  displayedResults: SkateparkView[] = [];
+  showIndoor = true;
+  showOutdoor = true;
 
   private map: any;
   private userMarker: any;
   private resultMarkers = new Map<number, any>();
+  private userLat: number | null = null;
+  private userLon: number | null = null;
 
   constructor(private cdr: ChangeDetectorRef) {}
 
@@ -58,12 +67,15 @@ export class MapComponent implements OnInit {
       async pos => {
         const lat = pos.coords.latitude;
         const lon = pos.coords.longitude;
+        this.userLat = lat;
+        this.userLon = lon;
         this.ensureMap(lat, lon);
 
         try {
-          const parks = await this.fetchSkateparks(lat, lon, 5000);
+          // 100 miles ≈ 160,934 meters
+          const parks = await this.fetchSkateparks(lat, lon, 160934);
           this.results = parks;
-          this.placeResultMarkers(parks);
+          this.applyFiltersAndMarkers();
         } catch (e) {
           this.error = 'Failed to load skateparks. Please try again.';
         } finally {
@@ -136,7 +148,7 @@ export class MapComponent implements OnInit {
     return Array.from(unique.values());
   }
 
-  private placeResultMarkers(parks: SkateparkResult[]): void {
+  private placeResultMarkers(parks: Array<SkateparkResult | SkateparkView>): void {
     // Clear existing
     this.resultMarkers.forEach(marker => marker.remove());
     this.resultMarkers.clear();
@@ -165,4 +177,53 @@ export class MapComponent implements OnInit {
     }
   }
 
+  onToggleIndoor(value: boolean): void {
+    this.showIndoor = value;
+    this.applyFiltersAndMarkers();
+  }
+
+  onToggleOutdoor(value: boolean): void {
+    this.showOutdoor = value;
+    this.applyFiltersAndMarkers();
+  }
+
+  private applyFiltersAndMarkers(): void {
+    if (this.userLat == null || this.userLon == null) {
+      this.displayedResults = [];
+      this.placeResultMarkers([]);
+      this.cdr.markForCheck();
+      return;
+    }
+    // Enrich with distance and indoor/outdoor classification
+    const enriched: SkateparkView[] = this.results.map(r => {
+      const isIndoor = (r.tags?.['indoor'] ?? '').toLowerCase() === 'yes';
+      const distanceMiles = this.haversineMiles(this.userLat!, this.userLon!, r.lat, r.lon);
+      return { ...r, isIndoor, distanceMiles };
+    });
+    // Filter logic: indoor shows only isIndoor, outdoor shows not isIndoor (including missing tag)
+    const filtered = enriched.filter(p => {
+      if (p.isIndoor && !this.showIndoor) return false;
+      if (!p.isIndoor && !this.showOutdoor) return false;
+      return true;
+    });
+    // Sort by distance ascending
+    filtered.sort((a, b) => a.distanceMiles - b.distanceMiles);
+    this.displayedResults = filtered;
+    this.placeResultMarkers(filtered);
+    this.cdr.markForCheck();
+  }
+
+  private haversineMiles(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const toRad = (d: number) => d * Math.PI / 180;
+    const R_km = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d_km = R_km * c;
+    return d_km * 0.621371; // miles
+  }
 }
