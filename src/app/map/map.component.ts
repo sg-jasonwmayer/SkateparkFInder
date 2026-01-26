@@ -38,6 +38,7 @@ export class MapComponent implements OnInit {
   displayedResults: SkateparkView[] = [];
   showIndoor = true;
   showOutdoor = true;
+  filtersOpen = true;
 
   private map: any;
   private userMarker: any;
@@ -94,10 +95,11 @@ export class MapComponent implements OnInit {
 
   private ensureMap(lat: number, lon: number): void {
     if (!this.map) {
-      this.map = L.map('map').setView([lat, lon], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      this.map = L.map('map').setView([lat, lon], 10);
+      // Light basemap for a modern look
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
+        attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
       }).addTo(this.map);
     } else {
       this.map.setView([lat, lon], 13);
@@ -155,9 +157,15 @@ export class MapComponent implements OnInit {
 
     const bounds = L.latLngBounds([]);
     parks.forEach(p => {
-      const marker = L.marker([p.lat, p.lon], { title: p.name || 'Skatepark' })
-        .addTo(this.map)
-        .bindPopup(`<strong>${p.name || 'Skatepark'}</strong>`);
+      // Orange circle markers for a clean visual
+      const marker = L.circleMarker([p.lat, p.lon], {
+        radius: 6,
+        color: '#ff6d00',
+        fillColor: '#ff6d00',
+        fillOpacity: 0.9,
+        weight: 1.5
+      }).addTo(this.map);
+      marker.bindPopup(`<strong>${p.name || 'Skatepark'}</strong>`);
       this.resultMarkers.set(p.id, marker);
       bounds.extend([p.lat, p.lon]);
     });
@@ -184,6 +192,12 @@ export class MapComponent implements OnInit {
 
   onToggleOutdoor(value: boolean): void {
     this.showOutdoor = value;
+    this.applyFiltersAndMarkers();
+  }
+
+  clearAll(): void {
+    this.showIndoor = true;
+    this.showOutdoor = true;
     this.applyFiltersAndMarkers();
   }
 

@@ -1,29 +1,49 @@
 <div class="map-page">
   <div id="map" class="map"></div>
-  <div class="results">
-    <h2>Skateparks within 100 miles</h2>
-    <div class="filters">
-      <mat-slide-toggle [checked]="showIndoor" (change)="onToggleIndoor($event.checked)">
-        Indoor
-      </mat-slide-toggle>
-      <mat-slide-toggle [checked]="showOutdoor" (change)="onToggleOutdoor($event.checked)">
-        Outdoor
-      </mat-slide-toggle>
-    </div>
-    <div *ngIf="loading" class="muted">Finding your location and nearby parks...</div>
-    <div *ngIf="error" class="error">{{ error }}</div>
-    <div *ngIf="!loading && !error" class="muted" style="margin: 8px 0;">
-      Showing {{ displayedResults.length }} result{{ displayedResults.length === 1 ? '' : 's' }}
-    </div>
-    <mat-list *ngIf="!loading && displayedResults.length">
-      <mat-list-item *ngFor="let park of displayedResults" (click)="focusPark(park)">
-        <div mat-line>{{ park.name || 'Unnamed skatepark' }}</div>
-        <div mat-line class="muted">
-          {{ park.distanceMiles | number:'1.0-1' }} mi • {{ park.isIndoor ? 'Indoor' : 'Outdoor' }}
+
+  <div class="overlay overlay--left">
+    <div class="filter-card" [class.filter-card--collapsed]="!filtersOpen">
+      <div class="filter-card__header">
+        <div class="filter-card__title">Filter</div>
+        <div class="filter-card__actions">
+          <button class="btn btn--ghost" (click)="clearAll()">Clear All</button>
+          <button class="btn btn--icon" (click)="filtersOpen = !filtersOpen" [attr.aria-expanded]="filtersOpen">
+            <span [class.rotated]="filtersOpen">⌄⌄</span>
+          </button>
         </div>
-      </mat-list-item>
-    </mat-list>
-    <div *ngIf="!loading && !displayedResults.length && !error" class="muted">No skateparks found with current filters.</div>
+      </div>
+
+      <div class="filter-card__body" *ngIf="filtersOpen">
+        <div class="filters">
+          <mat-slide-toggle [checked]="showIndoor" (change)="onToggleIndoor($event.checked)">
+            Indoor
+          </mat-slide-toggle>
+          <mat-slide-toggle [checked]="showOutdoor" (change)="onToggleOutdoor($event.checked)">
+            Outdoor
+          </mat-slide-toggle>
+        </div>
+        <div class="muted small">
+          {{ displayedResults.length }} result{{ displayedResults.length === 1 ? '' : 's' }} within 100 miles
+        </div>
+        <div class="results-list" *ngIf="!loading && !error && displayedResults.length">
+          <mat-list>
+            <mat-list-item *ngFor="let park of displayedResults" (click)="focusPark(park)">
+              <div mat-line>{{ park.name || 'Unnamed skatepark' }}</div>
+              <div mat-line class="muted">
+                {{ park.distanceMiles | number:'1.0-1' }} mi • {{ park.isIndoor ? 'Indoor' : 'Outdoor' }}
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </div>
+        <div *ngIf="loading" class="muted">Finding your location and nearby parks...</div>
+        <div *ngIf="error" class="error">{{ error }}</div>
+        <div *ngIf="!loading && !displayedResults.length && !error" class="muted">No skateparks found with current filters.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay overlay--right">
+    <div class="page-title"><span>Skate Parks</span></div>
   </div>
 </div>
 
